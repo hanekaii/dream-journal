@@ -16,9 +16,9 @@ def add_dream():
     dream_description = input("Describe your dream: ")
 
 
-    dream_tags = input("Add dream tags (comma-separated): ")
+    dream_tags = input("Add dream tags (comma-separated, e.g., flying, teeth): ")
 
-    conn = qlite3.connect("dreams.db")
+    conn = sqlite3.connect("dreams.db")
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -39,22 +39,61 @@ def add_dream():
     conn.close()
 
 def view_all_dreams():
-    print("test")
+    conn = sqlite3.connect("dreams.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM dreams")
+    rows = cursor.fetchall()
+
+    if not rows:
+            print("No dreams recorded yet.")
+    else:
+        for row in rows:
+            print("-------------------------")
+            print(f"DreamID: {row[0]}")
+            print(f"Date: {row[1]}")
+            print(f"Desc: {row[2]}")
+            print(f"Tags: {row[3]}")
+            print("-------------------------")
+
+    conn.close()
+
+
 
 def search_dreams():
-    print("test2")
+    search_tags = input("Enter tags to search for (comma-separated): ")
+    search_tags = [tag.strip().lower() for tag in search_tags.split(",") if tag.strip()] #lowercases
+
+    conn = sqlite3.connect("dreams.db")
+    cursor = conn.cursor()
+    
+    query = "SELECT * FROM dreams WHERE " + " OR ".join(["tags LIKE ?" for _ in search_tags])
+    params = [f"%{tag}%" for tag in search_tags]
+    cursor.execute(query, params)
+    results = cursor.fetchall()
+
+    if not results:
+            print("No dreams recorded yet.")
+    else:
+        for row in results:
+            print("-------------------------")
+            print(f"DreamID: {row[0]}")
+            print(f"Date: {row[1]}")
+            print(f"Desc: {row[2]}")
+            print(f"Tags: {row[3]}")
+            print("-------------------------")
+
 
 while running:
-    print('Menu:\n1. Add a Dream\n2. View \n3. Search Dreams \n4. Exit')
+    print('Menu:\n1. Add a Dream\n2. View \n3. Search Dreams \n4. Exit \n')
     user_input = input()
 
-    if user_input == 1:
+    if user_input == '1':
         add_dream()
-    elif user_input == 2:
+    elif user_input == '2':
         view_all_dreams()
-    elif user_input == 3:
+    elif user_input == '3':
         search_dreams()
-    elif user_input == 4:
+    elif user_input == '4':
         print("Bye!")
         running = False
     else:

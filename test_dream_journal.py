@@ -1,7 +1,8 @@
 import sqlite3
 
 try:
-    conn = sqlite3.connect(":memory:")  # in-memory test DB
+    conn = sqlite3.connect(":memory:")  #tests DB without writing to it
+    
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS dreams (
